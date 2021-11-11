@@ -9,6 +9,7 @@ string str;
 string q;
 logic [32:0] mem_address;
 logic [1:0] opcode;
+longint unsigned cpu_cycles,b;
 
 initial
 begin
@@ -33,38 +34,45 @@ if($value$plusargs("tracemem_references=%s", mem_referencesname))
 						
 						end
 				end
-				
+			$display("\n");	
 	end
+	
+			mem_references = $fopen(mem_referencesname, "r");
+				for(i=0;i<16;i++)
+				begin
+					b=cpu_cycles+i;
+					$fgets(str,mem_references);
+					q=str;
+					queue.push_back(q);
+					$display("%d=>queue[%0d] = %d",b,i ,queue[i]);
+				end
+		$display("QUEUE SIZE BEFORE REMOVAL%d",queue.size());
+		$display("===================================");
+		
+		$value$plusargs("stub=%d", stub);	
+		
+end
+		
 
-	mem_references = $fopen(mem_referencesname, "r");
-	for(i=0;i<16;i++)
+initial
 	begin
-		$fgets(str,mem_references);
-		q=str;
-		queue.push_back(q);
-	end
-	
-	
+	$value$plusargs("tracemem_references=%s", mem_referencesname);
+	cpu_cycles=0;
+		mem_references = $fopen(mem_referencesname, "r");
+		do begin
 		
-		if(debug==1)
-			begin
-			$display("===================================");
-				foreach(queue[i])
-					begin
-						$display(" queue[%0d] = %d ",i ,queue[i]);
-					end
-					
-			end
-		else
-			queue={};
-			
-		$value$plusargs("stub=%d", stub);
+			cpu_cycles++;
+		
+		end while($fscanf(mem_references,"%d %d %h",ctime,opcode,mem_address)==3);
+		
+		$display("THE CPU CYCLES => %d",cpu_cycles);
+		$display("===================================");
 		
 		
-		if(stub==1 && debug==1)
+		if(stub==1 && debug==1 && cpu_cycles>100)
 			begin
 				queue=queue[0:$-1];
-				$display("REMOVING ITEM FROM THE QUEUE\n");
+				$display("REMOVING AN ITEM FROM THE QUEUE\n");
 				
 				foreach(queue[i])
 					begin
@@ -75,7 +83,5 @@ if($value$plusargs("tracemem_references=%s", mem_referencesname))
 			end
 		else
 			queue=queue;
-		
-end
-			
+	end
 endmodule
