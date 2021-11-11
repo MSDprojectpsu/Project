@@ -1,7 +1,12 @@
 module msdproject;
 
-int debug,mem_references,ctime;
+string queue[$:16];
+
+int j,i;
+int debug,mem_references,ctime,stub;
 string mem_referencesname, scan_input;
+string str;
+string q;
 logic [32:0] mem_address;
 logic [1:0] opcode;
 
@@ -12,10 +17,10 @@ if($value$plusargs("tracemem_references=%s", mem_referencesname))
 	begin
 		mem_references = $fopen(mem_referencesname, "r");
 			if (mem_references == 0 && debug==1) 
-			begin	
-				$display ("ERROR: mem_references input file is empty");
+				begin	
+					$display ("ERROR: mem_references input file is empty");
 					
-			end
+				end
 				
 			else
 				begin
@@ -28,6 +33,49 @@ if($value$plusargs("tracemem_references=%s", mem_referencesname))
 						
 						end
 				end
+				
 	end
+
+	mem_references = $fopen(mem_referencesname, "r");
+	for(i=0;i<16;i++)
+	begin
+		$fgets(str,mem_references);
+		q=str;
+		queue.push_back(q);
+	end
+	
+	
+		
+		if(debug==1)
+			begin
+			$display("===================================");
+				foreach(queue[i])
+					begin
+						$display(" queue[%0d] = %d ",i ,queue[i]);
+					end
+					
+			end
+		else
+			queue={};
+			
+		$value$plusargs("stub=%d", stub);
+		
+		
+		if(stub==1 && debug==1)
+			begin
+				queue=queue[0:$-1];
+				$display("REMOVING ITEM FROM THE QUEUE\n");
+				
+				foreach(queue[i])
+					begin
+						$display(" queue[%0d]=%d ",i ,queue[i]);
+					end
+				$display("=======================================");
+				$display("QUEUE SIZE AFTER REMOVAL%d",queue.size());
+			end
+		else
+			queue=queue;
+		
 end
+			
 endmodule
