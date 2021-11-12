@@ -69,7 +69,7 @@ initial
 		$display("===================================");
 		
 		
-		if(stub==1 && debug==1 && cpu_cycles>100)
+		if(stub==1 && debug==1 && cpu_cycles>=100)
 			begin
 				queue=queue[0:$-1];
 				$display("REMOVING AN ITEM FROM THE QUEUE\n");
