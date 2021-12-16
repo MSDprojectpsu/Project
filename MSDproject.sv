@@ -13,7 +13,7 @@ string str,str1,initial_request;
 string q;
 logic [32:0] mem_address,t;
 logic [1:0] opcode;
-longint unsigned cpu_cycles,b;
+longint unsigned cpu_cycles,b,ba;
 
 //Memory address split
 logic [2:0]Byte;
